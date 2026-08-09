@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SAKHI-CARE | AI Women's Health Navigator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        .session-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .new-session-button {
+            border: 1px solid rgba(80, 70, 110, .16);
+            background: #fff;
+            color: #5d5870;
+            border-radius: 999px;
+            padding: 9px 13px;
+            cursor: pointer;
+            font: inherit;
+            font-size: .82rem;
+            transition: .2s ease;
+        }
+
+        .new-session-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(50, 40, 80, .08);
+        }
+
+        .conversational-chat {
+            overflow: hidden;
+        }
+
+        .chat-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(80, 70, 110, .10);
+            background: rgba(255,255,255,.68);
+        }
+
+        .chat-ai-identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-ai-identity strong {
+            display: block;
+        }
+
+        .chat-ai-identity span {
+            display: block;
+            margin-top: 3px;
+            font-size: .78rem;
+            opacity: .65;
+        }
+
+        .large-avatar {
+            width: 42px !important;
+            height: 42px !important;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            flex: 0 0 42px;
+        }
+
+        .online-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #38b978;
+            margin-right: 4px;
+        }
+
+        .question-progress {
+            min-width: 170px;
+        }
+
+        .question-progress > span {
+            display: block;
+            text-align: right;
+            font-size: .76rem;
+            margin-bottom: 6px;
+            opacity: .65;
+        }
+
+        .progress-track {
+            width: 170px;
+            height: 6px;
+            border-radius: 99px;
+            overflow: hidden;
+            background: #ece9f2;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 16.6%;
+            border-radius: 99px;
+            background: linear-gradient(
+                90deg,
+                #b56bcf,
+                #e98bb0
+            );
+            transition: width .35s ease;
+        }
+
+        .chat-messages {
+            min-height: 380px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding: 22px;
+            scroll-behavior: smooth;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(251,248,252,.85),
+                    rgba(255,255,255,.96)
+                );
+        }
+
+        .chat-row {
+            display: flex;
+            gap: 10px;
+            margin: 0 0 17px;
+            animation: messageIn .35s ease both;
+        }
+
+        .chat-row.user {
+            justify-content: flex-end;
+        }
+
+        .chat-row.user .chat-bubble {
+            background: linear-gradient(
+                135deg,
+                #8f68c7,
+                #c47ab2
+            );
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-row.ai .chat-bubble {
+            background: white;
+            border: 1px solid rgba(80,70,110,.09);
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 8px 25px rgba(55,40,80,.05);
+        }
+
+        .chat-bubble {
+            max-width: min(78%, 620px);
+            padding: 13px 16px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: .95rem;
+        }
+
+        .chat-sender {
+            font-size: .72rem;
+            font-weight: 700;
+            opacity: .62;
+            margin-bottom: 4px;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+        }
+
+        .chat-row.user .chat-sender {
+            text-align: right;
+        }
+
+        .chat-time {
+            font-size: .68rem;
+            opacity: .45;
+            margin-top: 5px;
+        }
+
+        .ai-mini-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(
+                135deg,
+                #f3d9ee,
+                #e6dcfa
+            );
+            flex: 0 0 34px;
+            font-size: 15px;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            padding: 0 22px 15px;
+            background: rgba(255,255,255,.96);
+        }
+
+        .quick-reply {
+            border: 1px solid rgba(146,95,173,.25);
+            background: #fff;
+            color: #66506d;
+            padding: 9px 13px;
+            border-radius: 999px;
+            cursor: pointer;
+            font: inherit;
+            font-size: .84rem;
+            transition: .2s ease;
+        }
+
+        .quick-reply:hover {
+            transform: translateY(-2px);
+            background: #faf2fb;
+            border-color: rgba(146,95,173,.45);
+        }
+
+        .typing-bubble {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 12px 15px;
+        }
+
+        .typing-bubble span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #aa83b7;
+            animation: typingDot 1.1s infinite;
+        }
+
+        .typing-bubble span:nth-child(2) {
+            animation-delay: .15s;
+        }
+
+        .typing-bubble span:nth-child(3) {
+            animation-delay: .3s;
+        }
+
+        .conversational-input textarea {
+            min-height: 72px;
+            resize: none;
+        }
+
+        .chat-hint {
+            padding: 10px 22px 14px;
+            font-size: .76rem;
+            opacity: .62;
+            border-top: 1px solid rgba(80,70,110,.07);
+        }
+
+        .doctor-question-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(80,70,110,.08);
+        }
+
+        .doctor-question-item:last-child {
+            border-bottom: 0;
+        }
+
+        .doctor-question-item span {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(180,120,190,.12);
+            font-weight: 700;
+            flex: 0 0 28px;
+        }
+
+        .doctor-question-item p {
+            margin: 0;
+        }
+
+        .summary-row {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(80,70,110,.08);
+        }
+
+        .summary-row strong,
+        .summary-row span {
+            display: block;
+        }
+
+        .summary-row span {
+            margin-top: 4px;
+            opacity: .75;
+        }
+
+        .summary-intro {
+            padding-bottom: 10px;
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typingDot {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: .45;
+            }
+
+            30% {
+                transform: translateY(-4px);
+                opacity: 1;
+            }
+        }
+
+        @media(max-width:700px) {
+
+            .chat-topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .question-progress,
+            .progress-track {
+                width: 100%;
+            }
+
+            .question-progress > span {
+                text-align: left;
+            }
+
+            .chat-bubble {
+                max-width: 88%;
+            }
+
+            .chat-messages {
+                min-height: 330px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a href="#home" class="brand">
+
+            <div class="brand-logo">
+                ✦
+            </div>
+
+            <div>
+                <strong>SAKHI-CARE</strong>
+                <span>AI Women's Health Navigator</span>
+            </div>
+
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="#navigator">
+                Navigator
+            </a>
+
+            <a href="#how-it-works">
+                How it works
+            </a>
+
+            <a href="#privacy">
+                Privacy
+            </a>
+
+        </nav>
+
+        <button
+            class="language-button"
+            id="languageButton"
+            type="button"
+        >
+            🌐 EN
+        </button>
+
+    </header>
+
+    <main>
+
+        <section class="hero" id="home">
+
+            <div class="hero-content">
+
+                <div class="ai-label">
+
+                    <span class="live-dot"></span>
+
+                    AI-POWERED HEALTH NAVIGATION
+
+                </div>
+
+                <h1>
+
+                    From confusion
+
+                    <span>
+                        to the right next step.
+                    </span>
+
+                </h1>
+
+                <p>
+
+                    SAKHI-CARE helps women understand a health concern,
+                    recognize when professional care may be important,
+                    and prepare for a meaningful conversation with
+                    a qualified healthcare professional.
+
+                </p>
+
+                <div class="hero-buttons">
+
+                    <button
+                        class="primary-button"
+                        id="startButton"
+                        type="button"
+                    >
+
+                        Talk to SAKHI AI
+
+                        <span>
+                            →
+                        </span>
+
+                    </button>
+
+                    <div class="privacy-note">
+
+                        🔐 No name required • Minimum information • No diagnosis
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            
+
+            <div class="hero-visual">
+
+                <div class="ai-circle">
+
+                    <div class="ai-core">
+                        ✦
+                    </div>
+
+                    <div class="orbit orbit-1"></div>
+
+                    <div class="orbit orbit-2"></div>
+
+                </div>
+
+                <div class="floating-card floating-top">
+
+                    <span>
+                        🤖
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            SAKHI AI
+                        </strong>
+
+                        <small>
+                            Ready to listen
+                        </small>
+
+                    </div>
+
+                    <i></i>
+
+                </div>
+
+                <div class="floating-card floating-bottom">
+
+                    <span>
+                        🛡️
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Safety first
+                        </strong>
+
+                        <small>
+                            Navigation, not diagnosis
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        
+
+        <section class="quick-topics">
+
+            <div class="section-label">
+                START WITH A TOPIC
+            </div>
+
+            <div class="topic-grid">
+
+                <button
+                    class="topic-card"
+                    data-topic="My periods have become irregular"
+                >
+
+                    <span class="topic-icon">
+                        🌸
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Periods & Cycles
+                        </strong>
+
+                        <small>
+                            Something changed?
+                        </small>
+
+                    </div>
+
+                    <b>
+                        →
+                    </b>
+
+                </button>
+
+                <button
+                    class="topic-card"
+                    data-topic="I have questions about PCOS"
+                >
+
+                    <span class="topic-icon">
+                        🧬
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            PCOS & Hormones
+                        </strong>
+
+                        <small>
+                            Understand the basics
+                        </small>
+
+                    </div>
+
+                    <b>
+                        →
+                    </b>
+
+                </button>
+
+                <button
+                    class="topic-card"
+                    data-topic="I have a sensitive reproductive health concern"
+                >
+
+                    <span class="topic-icon">
+                        💗
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Reproductive Health
+                        </strong>
+
+                        <small>
+                            Ask without judgment
+                        </small>
+
+                    </div>
+
+                    <b>
+                        →
+                    </b>
+
+                </button>
+
+                <button
+                    class="topic-card"
+                    data-topic="I want help preparing for a doctor appointment"
+                >
+
+                    <span class="topic-icon">
+                        🩺
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Doctor Visit
+                        </strong>
+
+                        <small>
+                            Prepare your questions
+                        </small>
+
+                    </div>
+
+                    <b>
+                        →
+                    </b>
+
+                </button>
+
+            </div>
+
+        </section>
+
+        
+
+        <section
+            class="navigator"
+            id="navigator"
+        >
+
+            <div class="navigator-heading">
+
+                <div>
+
+                    <div class="section-label">
+                        SAKHI AI • PRIVATE SESSION
+                    </div>
+
+                    <h2>
+
+                        Tell me what
+
+                        <span>
+                            changed.
+                        </span>
+
+                    </h2>
+
+                    <p>
+
+                        You don't need medical words.
+                        Describe it the way you would explain it
+                        to a friend. SAKHI will ask follow-up
+                        questions based on your answers.
+
+                    </p>
+
+                </div>
+
+                <div class="session-actions">
+
+                    <div class="session-status">
+
+                        <span></span>
+
+                        Private session
+
+                    </div>
+
+                    <button
+                        id="newSessionButton"
+                        class="new-session-button"
+                        type="button"
+                    >
+
+                        ↻ New session
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            
+
+            <div class="chat-box conversational-chat">
+
+                
+
+                <div class="chat-topbar">
+
+                    <div class="chat-ai-identity">
+
+                        <div class="avatar large-avatar">
+                            ✦
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                SAKHI AI
+                            </strong>
+
+                            <span>
+
+                                <i class="online-dot"></i>
+
+                                Private conversation
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    
+
+                    <div class="question-progress">
+
+                        <span id="progressLabel">
+                            Question 1 of 6
+                        </span>
+
+                        <div class="progress-track">
+
+                            <div
+                                id="progressBar"
+                                class="progress-fill"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                
+
+                <div
+                    id="chatMessages"
+                    class="chat-messages"
+                    aria-live="polite"
+                ></div>
+
+                
+
+                <div
+                    id="quickReplies"
+                    class="quick-replies"
+                ></div>
+
+                
+
+                <div class="input-container conversational-input">
+
+                    <textarea
+                        id="userConcern"
+                        rows="2"
+                        placeholder="Type your answer here..."
+                        aria-label="Your answer"
+                    ></textarea>
+
+                    <div class="input-bottom">
+
+                        <span>
+                            🔒 Share only what you're comfortable sharing.
+                        </span>
+
+                        <button
+                            id="analyzeButton"
+                            class="analyze-button"
+                            type="button"
+                        >
+
+                            Send
+
+                            <span>
+                                ↑
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="chat-hint">
+
+                    💡 You can type naturally.
+                    SAKHI will ask only the questions that
+                    are relevant to your answers.
+
+                </div>
+
+            </div>
+
+            
+
+            <div
+                class="thinking-box hidden"
+                id="thinkingBox"
+            >
+
+                <div class="thinking-icon">
+                    ✦
+                </div>
+
+                <div>
+
+                    <strong>
+                        NARI AI is thinking...
+                    </strong>
+
+                    <p id="thinkingText">
+                        Understanding your concern
+                    </p>
+
+                </div>
+
+            </div>
+
+            
+
+            <div class="preferences">
+
+                <div class="preference">
+
+                    <label for="language">
+
+                        🌐 Language
+
+                    </label>
+
+                    <select id="language">
+
+                        <option value="english">
+                            English
+                        </option>
+
+                        <option value="telugu">
+                            తెలుగు
+                        </option>
+
+                        <option value="tenglish">
+                            Telugu + English
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="preference">
+
+                    <label for="explanationStyle">
+
+                        🧠 Explanation
+
+                    </label>
+
+                    <select id="explanationStyle">
+
+                        <option value="simple">
+                            Simple
+                        </option>
+
+                        <option value="standard">
+                            Standard
+                        </option>
+
+                        <option value="detailed">
+                            Detailed
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            
+
+            <div
+                id="results"
+                class="results hidden"
+            >
+
+                
+
+                <article
+                    class="result-card safety-card"
+                    id="safetyCard"
+                >
+
+                    <div class="result-heading">
+
+                        <div class="result-icon">
+                            🛡️
+                        </div>
+
+                        <div>
+
+                            <span>
+                                SAFETY CHECK
+                            </span>
+
+                            <h3 id="safetyTitle">
+                                Checking your information...
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                    <p id="safetyMessage"></p>
+
+                </article>
+
+                
+
+                <article class="result-card">
+
+                    <div class="result-heading">
+
+                        <div class="result-icon">
+                            🧠
+                        </div>
+
+                        <div>
+
+                            <span>
+                                AI UNDERSTANDING
+                            </span>
+
+                            <h3>
+                                What I understand
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                    <div id="understanding"></div>
+
+                </article>
+
+                
+
+                <div class="two-cards">
+
+                    <article class="mini-card">
+
+                        <div class="mini-icon green">
+                            ✓
+                        </div>
+
+                        <span>
+                            WHAT WE KNOW
+                        </span>
+
+                        <p id="known"></p>
+
+                    </article>
+
+                    <article class="mini-card">
+
+                        <div class="mini-icon orange">
+                            ?
+                        </div>
+
+                        <span>
+                            WHAT WE DON'T KNOW
+                        </span>
+
+                        <p>
+
+                            A conversation like this cannot
+                            determine the underlying medical cause.
+                            A qualified professional may need more
+                            information or examination.
+
+                        </p>
+
+                    </article>
+
+                </div>
+
+                
+
+                <article class="next-step">
+
+                    <div class="next-icon">
+                        🧭
+                    </div>
+
+                    <div>
+
+                        <span>
+                            YOUR NEXT STEP
+                        </span>
+
+                        <h3 id="nextTitle">
+                            Preparing your guidance...
+                        </h3>
+
+                        <p id="nextMessage"></p>
+
+                    </div>
+
+                </article>
+
+                
+
+                <article class="doctor-kit">
+
+                    <div class="doctor-title">
+
+                        <div>
+
+                            <span>
+                                SAKHI AI • DOCTOR CONVERSATION KIT
+                            </span>
+
+                            <h3>
+                                Questions to take with you
+                            </h3>
+
+                        </div>
+
+                        <div class="doctor-icon">
+                            🩺
+                        </div>
+
+                    </div>
+
+                    <div id="doctorQuestions"></div>
+
+                </article>
+
+                
+
+                <article class="summary-card">
+
+                    <div class="summary-title">
+
+                        <div>
+
+                            <span>
+                                READY FOR YOUR CONSULTATION?
+                            </span>
+
+                            <h3>
+                                📋 My Consultation Card
+                            </h3>
+
+                        </div>
+
+                        <button
+                            id="copySummary"
+                            type="button"
+                        >
+                            Copy
+                        </button>
+
+                    </div>
+
+                    <div id="summary"></div>
+
+                </article>
+
+                
+
+                <div class="boundary">
+
+                    <div class="boundary-icon">
+                        🛡️
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            SAKHI-CARE is a health navigator,
+                            not a doctor.
+                        </strong>
+
+                        <p>
+
+                            This prototype provides general health
+                            education and navigation. It does not
+                            diagnose conditions, prescribe medicines,
+                            or replace professional medical care.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        
+
+        <section
+            class="how"
+            id="how-it-works"
+        >
+
+            <div class="section-label">
+                HOW THE AI WORKS
+            </div>
+
+            <h2>
+
+                AI that knows when to
+
+                <span>
+                    help — and when to step back.
+                </span>
+
+            </h2>
+
+            <div class="steps">
+
+                <div class="step">
+
+                    <b>
+                        01
+                    </b>
+
+                    <div class="step-icon">
+                        💬
+                    </div>
+
+                    <h3>
+                        Understand
+                    </h3>
+
+                    <p>
+
+                        The user explains the concern
+                        in everyday language.
+
+                    </p>
+
+                </div>
+
+                <div class="step">
+
+                    <b>
+                        02
+                    </b>
+
+                    <div class="step-icon">
+                        🔎
+                    </div>
+
+                    <h3>
+                        Ask less
+                    </h3>
+
+                    <p>
+
+                        SAKHI focuses on information
+                        relevant to the user's concern.
+
+                    </p>
+
+                </div>
+
+                <div class="step">
+
+                    <b>
+                        03
+                    </b>
+
+                    <div class="step-icon">
+                        🚨
+                    </div>
+
+                    <h3>
+                        Check safety
+                    </h3>
+
+                    <p>
+
+                        Potential warning signals are
+                        prioritized before general education.
+
+                    </p>
+
+                </div>
+
+                <div class="step">
+
+                    <b>
+                        04
+                    </b>
+
+                    <div class="step-icon">
+                        🩺
+                    </div>
+
+                    <h3>
+                        Prepare
+                    </h3>
+
+                    <p>
+
+                        The user leaves with a clearer
+                        next step and questions for a provider.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        
+
+        <section class="myth-section">
+
+            <div class="myth-content">
+
+                <div>
+
+                    <div class="section-label">
+                        AI MYTH CHECKER
+                    </div>
+
+                    <h2>
+
+                        Heard something
+
+                        <span>
+                            about women's health?
+                        </span>
+
+                    </h2>
+
+                    <p>
+
+                        Ask SAKHI AI to explain whether
+                        a health claim needs context.
+
+                    </p>
+
+                </div>
+
+                <div class="myth-box">
+
+                    <textarea
+                        id="mythInput"
+                        placeholder="Example: Irregular periods always mean PCOS."
+                    ></textarea>
+
+                    <button
+                        id="mythButton"
+                        type="button"
+                    >
+
+                        ✦ Explain with AI
+
+                    </button>
+
+                    <div
+                        id="mythResult"
+                        class="myth-result hidden"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        
+
+        <section
+            class="privacy"
+            id="privacy"
+        >
+
+            <div class="privacy-content">
+
+                <div>
+
+                    <div class="section-label">
+                        TRUST BY DESIGN
+                    </div>
+
+                    <h2>
+
+                        Your health is
+
+                        <span>
+                            your information.
+                        </span>
+
+                    </h2>
+
+                    <p>
+
+                        SAKHI-CARE follows a minimum-information
+                        approach. The user should never need to
+                        provide unnecessary identifying information
+                        just to ask a health question.
+
+                    </p>
+
+                </div>
+
+                <div class="privacy-list">
+
+                    <div>
+
+                        <i>
+                            ✓
+                        </i>
+
+                        No unnecessary identity information
+
+                    </div>
+
+                    <div>
+
+                        <i>
+                            ✓
+                        </i>
+
+                        Sensitive questions can be skipped
+
+                    </div>
+
+                    <div>
+
+                        <i>
+                            ✓
+                        </i>
+
+                        Education is separated from diagnosis
+
+                    </div>
+
+                    <div>
+
+                        <i>
+                            ✓
+                        </i>
+
+                        Uncertainty is clearly communicated
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    
+
+    <footer>
+
+        <strong>
+            ✦ SAKHI-CARE
+        </strong>
+
+        <p>
+            Don't diagnose. Navigate.
+        </p>
+
+        <small>
+
+            AI health-navigation prototype •
+            Not a diagnostic service
+
+        </small>
+
+    </footer>
+
+    
+
+    <script src="script.js"></script>
+
+</body>
+</html>
